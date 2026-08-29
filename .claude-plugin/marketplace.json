@@ -4,15 +4,15 @@
     "name": "xujinglong8814-WeiBeta"
   },
   "metadata": {
-    "description": "Destructive VM disk cleanup with safety disclosures and a Phase 3 approval gate",
-    "version": "0.2.1"
+    "description": "Destructive Cowork VM cleanup that excludes mounted host workspaces and gates Phase 3",
+    "version": "0.3.0"
   },
   "plugins": [
     {
       "name": "vm-disk-cleanup",
       "source": "./",
-      "description": "Destructive phased VM cleanup with explicit approval before heavy deletion",
-      "version": "0.2.1",
+      "description": "Cowork-only VM cleanup with host mounts excluded and explicit approval before heavy deletion",
+      "version": "0.3.0",
       "category": "utilities",
       "tags": [
         "vm",

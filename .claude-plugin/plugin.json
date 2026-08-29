@@ -1,7 +1,7 @@
 {
   "name": "vm-disk-cleanup",
-  "description": "Destructive phased cleanup for disk-full Cowork VMs and Claude Code environments, with explicit approval required before heavy cleanup.",
-  "version": "0.2.1",
+  "description": "Destructive phased cleanup for Claude Desktop Cowork VMs, with mounted host workspaces excluded and explicit approval before heavy cleanup.",
+  "version": "0.3.0",
   "author": {
     "name": "MSApps",
     "url": "https://github.com/MSApps-Mobile/claude-plugins/tree/main/plugins/vm-disk-cleanup"
@@ -18,7 +18,6 @@
   ],
   "homepage": "https://github.com/xujinglong8814-WeiBeta/vm-disk-cleanup",
   "platforms": [
-    "claude-code",
     "cowork"
   ]
 }

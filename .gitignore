@@ -1,0 +1,2 @@
+# Runtime audit records can expose local paths and package or project names.
+.vm-disk-cleanup/audit/

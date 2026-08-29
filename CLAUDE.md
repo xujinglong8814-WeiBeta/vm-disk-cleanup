@@ -1,6 +1,6 @@
 # VM Disk Cleanup
 
-Prevent and recover from disk-full errors in Cowork VMs and Claude Code sandboxes. Automatically or manually trigger multi-phase cleanup to free up space.
+Prevent and recover from disk-full errors only in Claude Desktop Cowork VMs. Automatically or manually trigger multi-phase cleanup while excluding mounted host-workspace trees.
 
 ## Available Tools/Skills
 
@@ -14,7 +14,8 @@ Prevent and recover from disk-full errors in Cowork VMs and Claude Code sandboxe
    - Python bytecode files (.pyc, __pycache__)
    - Matching temporary and log file patterns under `/tmp`
    - APT package cache
-   - Destructive; `/sessions`, current-directory, and shared `/tmp` matches may affect other work
+   - Destructive; VM-internal `/sessions` and shared `/tmp` matches may affect other work
+   - Always prune `/sessions/*/mnt`; never scan the current directory as a cleanup root
 
 2. **Phase 2 (Medium)**: Frees development tool caches
    - pip package cache
@@ -30,7 +31,7 @@ Prevent and recover from disk-full errors in Cowork VMs and Claude Code sandboxe
 
 ## Configuration
 
-- Requires Bash access to the VM or sandbox
+- Requires Bash access to the Cowork VM
 - Auto-activates when ENOSPC errors occur during operations
 - Can be manually triggered at any time
 
@@ -46,10 +47,12 @@ Prevent and recover from disk-full errors in Cowork VMs and Claude Code sandboxe
 ## Best Practices
 
 - Run Phase 1 cleanup regularly to prevent emergencies
-- Monitor disk usage, especially in sandboxes with large dependency installations
+- Monitor Cowork VM-internal disk usage, especially after large dependency installations
 - Use scheduled cleanup in long-running sessions with frequent builds
 - Phase 3 cleanup will require reinstalling dependencies and may remove global CLI tools
-- Before Phase 3, show candidate paths and sizes, disclose the fresh-VM recovery procedure, and require the exact confirmation phrase documented in the skill
+- Before Phase 3, generate the bundled read-only audit manifest, show its complete candidate table, absolute path, and SHA-256, disclose the fresh-VM recovery procedure, and require the exact confirmation phrase documented in the skill
+- A Phase 3 scan or manifest failure closes the gate; never ask the user to discover candidate paths manually
+- Desktop Commander is read-only for this plugin; no host filesystem deletion is authorized
 - Scheduled or automatic cleanup may run only Phases 1 and 2; it cannot grant Phase 3 approval
 - Before Phases 1 and 2, disclose their exact deletion scopes and active-process risks
 - Treat commands that suppress errors as best-effort; never claim all targets were removed
