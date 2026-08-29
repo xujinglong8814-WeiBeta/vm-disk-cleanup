@@ -8,7 +8,7 @@ description: >
   fail with disk-full errors. Also use proactively before heavy operations
   like npm install or pip install in long sessions.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   platforms: ["claude-code", "cowork"]
 ---
 
@@ -64,7 +64,38 @@ npm cache clean --force 2>/dev/null
 rm -rf ~/.npm/_cacache 2>/dev/null
 ```
 
-### Phase 3: Heavy cleanup (removes reinstallable items)
+### Phase 3: Heavy cleanup (explicit approval required)
+
+Phase 3 deletes dependencies, build outputs, and potentially global tools. It
+must never run automatically, including from an ENOSPC trigger, proactive
+cleanup, or a scheduled task.
+
+Before running any Phase 3 command:
+
+1. Re-check disk usage with `df -h /` and confirm that Phases 1 and 2 were not
+   sufficient.
+2. Perform a read-only scan and show the exact candidate paths and estimated
+   sizes. Do not hide scan errors.
+3. Warn the user that:
+   - `node_modules` will require dependency reinstallation;
+   - `.next`, `dist`, and `build` may contain outputs that are not reproducible
+     unless the project and its inputs are preserved;
+   - `~/.npm-global/lib/node_modules/*` removes globally installed CLI tools,
+     not cache, and the original package list may be difficult to reconstruct;
+   - if the Cowork VM becomes unusable, fully quit Claude Desktop/Cowork and
+     reopen it to provision a fresh blank VM. All VM-internal state should be
+     treated as lost; only files confirmed to be in the mounted user workspace
+     should be expected to persist.
+4. Ask the user to reply exactly `CONFIRM PHASE 3 CLEANUP` and name the target
+   categories they approve. A confirmation applies only to the paths shown in
+   that prompt and only to the current cleanup run.
+5. If the user does not provide that confirmation, declines, or changes the
+   target list, stop before Phase 3. Never infer approval from the original
+   cleanup request or from approval of Phases 1 and 2.
+
+After confirmation, execute only the approved commands and paths. Global npm
+packages must be explicitly named as an approved category; otherwise skip the
+last command below.
 
 ```bash
 # Remove node_modules (recreate with npm install)
@@ -88,10 +119,13 @@ rm -rf ~/.npm-global/lib/node_modules/* 2>/dev/null
 2. Run Phase 1 commands (always)
 3. Check if space was freed — if yes and enough, stop here
 4. Run Phase 2 commands
-5. Run Phase 3 commands if more space is still needed
-6. Final disk check: `df -h /`
-7. Report before/after free space to the user
-8. If disk was over 80% full, recommend running this at session start
+5. If more space is still needed, complete the Phase 3 read-only scan, risk
+   disclosure, and explicit approval gate above
+6. Run only the approved Phase 3 targets; otherwise stop cleanup after Phase 2
+7. Final disk check: `df -h /`
+8. Report before/after free space, executed phases, skipped targets, and errors
+   to the user
+9. If disk was over 80% full, recommend running Phases 1 and 2 at session start
 
 ## When Disk Is Completely Full (Deadlock)
 
@@ -111,9 +145,11 @@ Cowork has **two separate disks** that fill independently:
 
 When Bash is broken, try these in order:
 
-**Step 1 — Clean Mac-side workspace with Desktop Commander:**
-Use `mcp__Desktop_Commander__start_process` to run `rm -rf` on the Mac host
-for large dirs in the user's workspace folder. Common culprits:
+**Step 1 — Optionally inspect the Mac-side workspace:**
+If Desktop Commander is installed and available, it can inspect the Mac host
+workspace. Treat it as an optional integration, not a required recovery path.
+Do not delete anything through it without showing the exact paths and obtaining
+the same Phase 3 confirmation described above. A common candidate is:
 ```
 rm -rf "/Users/<username>/Documents/Claude/<project>/node_modules"
 ```
@@ -133,8 +169,11 @@ This tool only enables deletion for paths inside the mounted user workspace
 There is no way to clean the VM's internal disk (apt cache, pip cache, npm
 cache) from outside the VM when Bash is broken, Docker is not installed on
 the Mac, and Desktop Commander cannot reach those paths.
-**Recommend restarting the Cowork app** — this resets the VM entirely.
-The user's files in their workspace folder are safe and unaffected.
+**Recommend fully quitting Claude Desktop/Cowork and reopening it** — closing
+only the window or conversation may not replace the VM. A fresh VM is expected
+to be blank: all VM-internal packages, caches, tools, and unsaved files are
+lost. Mounted user-workspace files are expected to persist, but the user should
+verify that important files are mounted before relying on this recovery path.
 
 ## Prevention Tips
 

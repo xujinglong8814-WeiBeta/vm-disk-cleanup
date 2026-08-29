@@ -24,6 +24,7 @@ Prevent and recover from disk-full errors in Cowork VMs and Claude Code sandboxe
    - node_modules directories
    - Build artifacts and compiled files
    - Global package installations
+   - Never runs without an exact per-run target list and explicit user approval
 
 ## Configuration
 
@@ -45,9 +46,11 @@ Prevent and recover from disk-full errors in Cowork VMs and Claude Code sandboxe
 - Run Phase 1 cleanup regularly to prevent emergencies
 - Monitor disk usage, especially in sandboxes with large dependency installations
 - Use scheduled cleanup in long-running sessions with frequent builds
-- Phase 3 cleanup will require reinstalling dependencies; use cautiously in production
+- Phase 3 cleanup will require reinstalling dependencies and may remove global CLI tools
+- Before Phase 3, show candidate paths and sizes, disclose the fresh-VM recovery procedure, and require the exact confirmation phrase documented in the skill
+- Scheduled or automatic cleanup may run only Phases 1 and 2; it cannot grant Phase 3 approval
 - Allows other operations to continue uninterrupted when auto-activated
 
 **Role:** Safely clean up disk space in Cowork VM environments by identifying and removing cache files, build artifacts, and temporary data.
 **Impact Level:** Medium (deletes files)
-**Approval Gates:** Confirm with user before deleting files larger than 100MB.
+**Approval Gates:** Confirm before deleting files larger than 100MB. Phase 3 always requires explicit per-run approval regardless of size.

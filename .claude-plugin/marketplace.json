@@ -1,0 +1,26 @@
+{
+  "name": "vm-disk-cleanup-private",
+  "owner": {
+    "name": "xujinglong8814-WeiBeta"
+  },
+  "metadata": {
+    "description": "Private, safety-gated VM disk cleanup plugin",
+    "version": "0.2.0"
+  },
+  "plugins": [
+    {
+      "name": "vm-disk-cleanup",
+      "source": "./",
+      "description": "Phased VM cleanup with explicit approval before heavy deletion",
+      "version": "0.2.0",
+      "category": "utilities",
+      "tags": [
+        "vm",
+        "disk-cleanup",
+        "cowork",
+        "claude-code",
+        "safety-gate"
+      ]
+    }
+  ]
+}
