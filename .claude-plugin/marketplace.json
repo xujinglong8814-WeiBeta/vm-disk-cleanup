@@ -1,18 +1,18 @@
 {
-  "name": "vm-disk-cleanup-private",
+  "name": "vm-disk-cleanup-marketplace",
   "owner": {
     "name": "xujinglong8814-WeiBeta"
   },
   "metadata": {
-    "description": "Private, safety-gated VM disk cleanup plugin",
-    "version": "0.2.0"
+    "description": "Destructive VM disk cleanup with safety disclosures and a Phase 3 approval gate",
+    "version": "0.2.1"
   },
   "plugins": [
     {
       "name": "vm-disk-cleanup",
       "source": "./",
-      "description": "Phased VM cleanup with explicit approval before heavy deletion",
-      "version": "0.2.0",
+      "description": "Destructive phased VM cleanup with explicit approval before heavy deletion",
+      "version": "0.2.1",
       "category": "utilities",
       "tags": [
         "vm",

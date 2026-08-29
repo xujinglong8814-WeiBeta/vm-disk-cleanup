@@ -12,13 +12,15 @@ Prevent and recover from disk-full errors in Cowork VMs and Claude Code sandboxe
 
 1. **Phase 1 (Emergency)**: Targets immediate wins
    - Python bytecode files (.pyc, __pycache__)
-   - Temporary system files (/tmp, /var/tmp)
+   - Matching temporary and log file patterns under `/tmp`
    - APT package cache
+   - Destructive; `/sessions`, current-directory, and shared `/tmp` matches may affect other work
 
 2. **Phase 2 (Medium)**: Frees development tool caches
    - pip package cache
    - npm package cache
    - Other package manager caches
+   - Destructive; later installs may require network access to rebuild caches
 
 3. **Phase 3 (Heavy)**: Removes large artifacts
    - node_modules directories
@@ -49,7 +51,9 @@ Prevent and recover from disk-full errors in Cowork VMs and Claude Code sandboxe
 - Phase 3 cleanup will require reinstalling dependencies and may remove global CLI tools
 - Before Phase 3, show candidate paths and sizes, disclose the fresh-VM recovery procedure, and require the exact confirmation phrase documented in the skill
 - Scheduled or automatic cleanup may run only Phases 1 and 2; it cannot grant Phase 3 approval
-- Allows other operations to continue uninterrupted when auto-activated
+- Before Phases 1 and 2, disclose their exact deletion scopes and active-process risks
+- Treat commands that suppress errors as best-effort; never claim all targets were removed
+- Automatic cleanup can disrupt active processes; disclose the scope before use
 
 **Role:** Safely clean up disk space in Cowork VM environments by identifying and removing cache files, build artifacts, and temporary data.
 **Impact Level:** Medium (deletes files)

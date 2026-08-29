@@ -8,7 +8,7 @@ description: >
   fail with disk-full errors. Also use proactively before heavy operations
   like npm install or pip install in long sessions.
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
   platforms: ["claude-code", "cowork"]
 ---
 
@@ -28,6 +28,24 @@ even diagnose the problem.
 
 Run cleanups in phases — smallest operations first so they succeed even
 when disk is critically low.
+
+### Mandatory disclosure before Phases 1 and 2
+
+Before executing cleanup, tell the user which phase is about to run and that
+it performs real deletion. Do not describe any phase as risk-free or lossless.
+
+- Explain that Phases 1 and 2 may run after an ENOSPC trigger or on a schedule
+  without the Phase 3 confirmation.
+- Disclose that `/sessions` and the current directory can contain matches from
+  other sessions or projects.
+- Disclose that the `/tmp` patterns can remove temporary files or logs used by
+  active processes.
+- Disclose that purging pip, npm, and APT caches can require later downloads
+  and may slow or block reinstalls when network access is unavailable.
+- State that commands using `2>/dev/null` are best-effort. Do not claim every
+  target was removed when individual errors were suppressed.
+
+This disclosure does not replace the Phase 3 approval gate below.
 
 ### Phase 1: Emergency (needs almost zero free space)
 Run these first when disk is completely full or nearly full:
@@ -126,6 +144,10 @@ rm -rf ~/.npm-global/lib/node_modules/* 2>/dev/null
 8. Report before/after free space, executed phases, skipped targets, and errors
    to the user
 9. If disk was over 80% full, recommend running Phases 1 and 2 at session start
+
+When reporting, label results as best-effort if a command suppressed errors.
+Never report complete success solely because a command returned no visible
+error.
 
 ## When Disk Is Completely Full (Deadlock)
 
